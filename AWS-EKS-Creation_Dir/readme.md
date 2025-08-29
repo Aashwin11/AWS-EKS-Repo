@@ -24,8 +24,10 @@ It sets up all required AWS infrastructure components, including:
 Once created, you can easily connect to the cluster using `kubectl` and deploy your workloads.
 
 ---
-
-## ⚠️NAT GATEWAY USAGE concept [Please refer to the below content]
+## ⚠️Please refer to the below content
+## NAT GATEWAY USAGE concept 
+## Bootstrap IAM user usage.
+## EKS Tag Necessity and Purpose
 ## Architecture
 
 - **VPC Setup**
@@ -134,6 +136,8 @@ To destroy all resources created by Terraform and avoid ongoing costs:
 terraform destroy -auto-approve
 ```
 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## NAT GATEWAY USAGE:
 
 ### Worker Nodes are in Private Subnets
@@ -151,3 +155,35 @@ When you run kubectl get nodes, the name you see is often the Private IP DNS nam
 
 ### The Public Subnet Alternative
 As you noted, if we were to place the worker nodes in the public subnets, they would each receive a public IP address and could connect to the internet directly via the Internet Gateway. In that scenario, a NAT Gateway would not be required. However, this configuration is less secure as it exposes every worker node directly to the public internet.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## IAM Roles and User Access (kubeconfig)
+This project creates two primary IAM roles, neither of which is used directly by your personal IAM user for kubectl access.
+
+EKS Cluster Role (eks_aws_iam_role): Assumed by the AWS EKS service (eks.amazonaws.com). It grants the EKS control plane permission to manage AWS resources (like network interfaces) in your account.
+
+EKS Node Role (nodes_iam_role): Assumed by the EC2 instances (ec2.amazonaws.com) that act as worker nodes. It allows the kubelet on each node to communicate with the control plane and access other AWS services like ECR.
+
+### How Your IAM User Gets Cluster Access
+Your personal access to the cluster is granted automatically at creation time because of a single setting in the aws_eks_cluster resource:
+
+Terraform
+
+bootstrap_cluster_creator_admin_permissions = true
+When this is set to true, the IAM user or role that runs terraform apply is automatically added to the cluster's aws-auth ConfigMap and mapped to the powerful system:masters Kubernetes group. This gives the cluster creator immediate admin access.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## EKS Subnet Tags: Purpose and Necessity
+When you create a Kubernetes Service of type LoadBalancer in an EKS cluster, AWS automatically provisions an AWS Load Balancer (ALB or NLB) for you. These subnet tags are critical because they tell EKS where to place these automatically provisioned Load Balancers.
+
+### 1. The Cluster Discovery Tag: kubernetes.io/cluster/<cluster-name>
+Purpose: This tag allows the EKS control plane to discover which VPC resources (like subnets and security groups) it is allowed to manage.
+
+Necessity: Without this tag, the EKS cluster will not know which subnets belong to it. When you try to create a Load Balancer or a Persistent Volume, the operation will fail because the cluster cannot find any suitable subnets to use. It's the fundamental link that associates your VPC resources with a specific EKS cluster, making it essential for multi-cluster environments in a single AWS account.
+
+### 2. The Load Balancer Placement Tag: kubernetes.io/role/elb
+Purpose: This tag specifically designates a subnet as a suitable location for public, internet-facing Load Balancers.
+
+Necessity: When you create a standard public-facing Kubernetes Service of type LoadBalancer, EKS scans your VPC for subnets with this exact tag. It then places the new AWS Load Balancer across these tagged subnets. If no subnets have this tag, EKS cannot create the public Load Balancer, and your service will never become accessible from the internet.
+
+A similar tag, kubernetes.io/role/internal-elb, is used to designate private subnets as the location for internal Load Balancers, which are only accessible from within your VPC. By tagging your public and private subnets appropriately, you give EKS a clear map for automatically deploying both public-facing and internal services correctly.
