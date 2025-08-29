@@ -25,6 +25,7 @@ Once created, you can easily connect to the cluster using `kubectl` and deploy y
 
 ---
 
+## ⚠️NAT GATEWAY USAGE concept [Please refer to the below content]
 ## Architecture
 
 - **VPC Setup**
@@ -132,3 +133,20 @@ To destroy all resources created by Terraform and avoid ongoing costs:
 ```bash
 terraform destroy -auto-approve
 ```
+
+
+### Worker Nodes are in Private Subnets
+Following security best practices, this configuration deploys all EKS worker nodes into private subnets (private_zone_1 and private_zone_2). As a result, these nodes are not assigned public IP addresses and are isolated from direct inbound traffic from the internet, which is crucial for protecting your workloads.
+
+### The Critical Role of the NAT Gateway
+While secure, nodes in a private subnet are completely cut off from the internet. This presents a problem during their initial creation, as they must perform a "bootstrap" process. A brand new EC2 instance needs to connect to the EKS control plane's public API endpoint to receive instructions, download necessary components (like the VPC CNI plugin), and officially register itself as a part of the cluster.
+
+Without a path to the internet, this registration fails. This is where the NAT Gateway is essential. By placing the NAT Gateway in a public subnet (public_zone_1) and creating a route for all outbound traffic (0.0.0.0/0) from the private subnets to it, we create a secure, one-way bridge. The private nodes can now initiate outbound connections to the EKS API and public container registries, but the internet cannot initiate connections back to them.
+
+### kubectl and Node Registration
+The kubectl get nodes command works by communicating with the EKS control plane's API, not by connecting directly to the worker nodes. The control plane maintains a list of all nodes that have successfully registered with it. If a node cannot complete its registration because it has no internet path, the control plane will never know it exists, and it will not appear in the kubectl output.
+
+When you run kubectl get nodes, the name you see is often the Private IP DNS name of the EC2 instance. This is because all communication between the control plane and the nodes happens over your private VPC network. The NAT Gateway's only job is to enable that initial registration and allow for outbound tasks like pulling public images.
+
+### The Public Subnet Alternative
+As you noted, if we were to place the worker nodes in the public subnets, they would each receive a public IP address and could connect to the internet directly via the Internet Gateway. In that scenario, a NAT Gateway would not be required. However, this configuration is less secure as it exposes every worker node directly to the public internet.
