@@ -134,6 +134,7 @@ To destroy all resources created by Terraform and avoid ongoing costs:
 terraform destroy -auto-approve
 ```
 
+## NAT GATEWAY USAGE:
 
 ### Worker Nodes are in Private Subnets
 Following security best practices, this configuration deploys all EKS worker nodes into private subnets (private_zone_1 and private_zone_2). As a result, these nodes are not assigned public IP addresses and are isolated from direct inbound traffic from the internet, which is crucial for protecting your workloads.
