@@ -35,3 +35,6 @@ terraform/*
 *.swp
 *.swo
 *.DS_Store
+
+
+.terraform.lock.hcl
