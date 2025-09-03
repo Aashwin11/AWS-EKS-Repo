@@ -27,6 +27,8 @@ terraform.tfvars.json
 terraform.rc
 .terraform.lock.hcl
 
+
+.terraform.lock.hcl
 terraform/
 terraform/*
 # IDE / Editor specific
@@ -37,4 +39,5 @@ terraform/*
 *.DS_Store
 
 
-.terraform.lock.hcl
+
+
