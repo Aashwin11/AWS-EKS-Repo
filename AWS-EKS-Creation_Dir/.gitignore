@@ -25,7 +25,10 @@ terraform.tfvars.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+.terraform.lock.hcl
 
+terraform/
+terraform/*
 # IDE / Editor specific
 .vscode/
 .idea/
