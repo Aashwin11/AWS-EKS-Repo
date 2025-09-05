@@ -60,3 +60,11 @@ AWS-EKS-Creation_Dir_2/aws/*
 AWS-EKS-Creation_Dir_2/terraform
 AWS-EKS-Creation_Dir_2/.terraform.lock.hcl
 AWS-EKS-Creation_Dir_2/.terraform.tfstate.lock.info
+
+AWS-EKS-Creation_Dir_3/.terraform/
+AWS-EKS-Creation_Dir_3/.terraform/*
+AWS-EKS-Creation_Dir_3/aws
+AWS-EKS-Creation_Dir_3/aws/*
+AWS-EKS-Creation_Dir_3/terraform
+AWS-EKS-Creation_Dir_3/.terraform.lock.hcl
+AWS-EKS-Creation_Dir_3/.terraform.tfstate.lock.info
