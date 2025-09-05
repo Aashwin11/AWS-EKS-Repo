@@ -1,0 +1,62 @@
+# Local .terraform directories
+**/.terraform/*
+
+AWS-EKS-Creation*/aws/
+AWS-EKS-Creation*/aws/*
+
+AWS-EKS-Creation*/helm/*
+AWS-EKS-Creation*/helm/
+
+AWS-EKS-Creation*/kubernetes/*
+
+AWS-EKS-Creation*/kubernetes/
+
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Exclude plan files
+*.tfplan
+
+# Sensitive variable files
+terraform.tfvars
+terraform.tfvars.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+
+
+AWS-EKS-Creation_Dir/.terraform/
+AWS-EKS-Creation_Dir/.terraform/*
+AWS-EKS-Creation_Dir/aws
+AWS-EKS-Creation_Dir/aws/*
+AWS-EKS-Creation_Dir/terraform
+AWS-EKS-Creation_Dir/.terraform.lock.hcl
+AWS-EKS-Creation_Dir/.terraform.tfstate.lock.info
+
+AWS-EKS-Creation_Dir_2/.terraform/
+AWS-EKS-Creation_Dir_2/.terraform/*
+AWS-EKS-Creation_Dir_2/aws
+AWS-EKS-Creation_Dir_2/aws/*
+AWS-EKS-Creation_Dir_2/terraform
+AWS-EKS-Creation_Dir_2/.terraform.lock.hcl
+AWS-EKS-Creation_Dir_2/.terraform.tfstate.lock.info
